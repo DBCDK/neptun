@@ -10,6 +10,7 @@
     <properties>
         <jackson.version>2.8.8</jackson.version>
         <javaee.api.version>7.0</javaee.api.version>
+        <jaxws.version>2.5</jaxws.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
@@ -39,7 +40,44 @@
                     </webResources>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>${jaxws.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>forsrights.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <wsdlLocation>META-INF/wsdl/forsrights.wsdl</wsdlLocation>
+                            <wsdlDirectory>${basedir}/src/main/resources/wsdl</wsdlDirectory>
+                            <packageName>dk.dbc.forsrights.service</packageName>
+                            <staleFile>${project.build.directory}/jaxws/stale/forsrights.stale</staleFile>
+                        </configuration>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <vmArgs>
+                        <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+                    </vmArgs>
+                </configuration>
+            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <targetPath>META-INF/wsdl</targetPath>
+                <directory>${basedir}/src/main/resources/wsdl</directory>
+                <includes>
+                    <include>*.wsdl</include>
+                    <include>*.xsd</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
     <dependencies>
         <dependency>
