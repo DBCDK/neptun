@@ -21,6 +21,7 @@ public class Neptun extends Application {
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>();
         classes.add(ForsRightsConnectorBean.class);
+        classes.add(StatusBean.class);
         for (Class<?> clazz : classes) {
             LOGGER.info("Registered {} resource", clazz.getName());
         }
