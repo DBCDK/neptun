@@ -1,6 +1,6 @@
 package dk.dbc.neptun.rest;
 
-import dk.dbc.neptun.ForsRightsConnectorBean;
+import dk.dbc.neptun.AuthenticatorBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class Neptun extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>();
-        classes.add(ForsRightsConnectorBean.class);
+        classes.add(AuthenticatorBean.class);
         classes.add(StatusBean.class);
         for (Class<?> clazz : classes) {
             LOGGER.info("Registered {} resource", clazz.getName());

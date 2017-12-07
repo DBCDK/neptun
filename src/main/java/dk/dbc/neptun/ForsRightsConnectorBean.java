@@ -8,13 +8,7 @@ import dk.dbc.forsrights.service.ForsRightsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -22,13 +16,9 @@ import javax.xml.ws.BindingProvider;
 import java.io.StringReader;
 
 @Stateless
-@Path("")
 public class ForsRightsConnectorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(
         ForsRightsConnectorBean.class);
-
-    @Resource(lookup = "java:app/env/url/forsrights")
-    private String FORSRIGHTS_ENDPOINT;
 
     protected ForsRightsService service;
 
@@ -37,7 +27,7 @@ public class ForsRightsConnectorBean {
         service = new ForsRightsService();
     }
 
-    private boolean isUserAuthorized(String baseUrl, String user,
+    public boolean isUserAuthorized(String baseUrl, String user,
             String group, String password) throws ForsRightsConnectorException {
         ForsRightsPortType port = service.getForsRightsPortType();
         BindingProvider bindingProvider =
@@ -66,7 +56,7 @@ public class ForsRightsConnectorBean {
         }
     }
 
-    private AuthTriple parseAuthXml(String authXml) throws ForsRightsConnectorException {
+    public AuthTriple parseAuthXml(String authXml) throws ForsRightsConnectorException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(AuthTriple.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -74,35 +64,6 @@ public class ForsRightsConnectorBean {
                 authXml));
         } catch (JAXBException e) {
             throw new ForsRightsConnectorException(e);
-        }
-    }
-
-    /**
-     * looks up user rights in forsrights based on a netpunkt triple:
-     * userid, groupid, password
-     *
-     * @param authDataXml xml containing userid, groupid, and password
-     * @return 200 OK on authorised users, 401 Unauthorized on unauthorised
-     * users and 500 Server Error on backend exceptions
-     */
-    @POST
-    @Consumes(MediaType.APPLICATION_XML)
-    @Path("authenticate")
-    public Response authenticate(String authDataXml) {
-        try {
-            AuthTriple authTriple = parseAuthXml(authDataXml);
-            boolean authorized = isUserAuthorized(FORSRIGHTS_ENDPOINT,
-                authTriple.getUser(), authTriple.getGroup(),
-                authTriple.getPassword());
-            if(authorized) {
-                return Response.ok().build();
-            } else {
-                // 401 Unauthorized: auth credentials refused
-                return Response.status(401).build();
-            }
-        } catch (ForsRightsConnectorException e) {
-            LOGGER.error("unexpected exception when authorising user", e);
-            return Response.serverError().build();
         }
     }
 }

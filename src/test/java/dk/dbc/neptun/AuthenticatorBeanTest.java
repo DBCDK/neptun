@@ -22,7 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ForsRightsConnectorBeanTest {
+public class AuthenticatorBeanTest {
 
     private ForsRightsService mockedForsRightsService = mock(
         ForsRightsService.class);
@@ -37,9 +37,8 @@ public class ForsRightsConnectorBeanTest {
             "<group>steele</group>" +
             "<password>inn3r_g0dess</password>" +
             "</authTriple>";
-        final ForsRightsConnectorBean bean = new ForsRightsConnectorBean();
-        bean.service = mockedForsRightsService;
-        Response response = bean.authenticate(authDataXml);
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        Response response = authenticatorBean.authenticate(authDataXml);
 
         assertThat("response 200 OK", response.getStatus(), is(200));
     }
@@ -49,9 +48,8 @@ public class ForsRightsConnectorBeanTest {
         when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseOK()));
         final String authDataXml = "<blah></ok>";
-        final ForsRightsConnectorBean bean = new ForsRightsConnectorBean();
-        bean.service = mockedForsRightsService;
-        Response response = bean.authenticate(authDataXml);
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        Response response = authenticatorBean.authenticate(authDataXml);
 
         assertThat("response 500 server error", response.getStatus(), is(500));
     }
@@ -65,11 +63,19 @@ public class ForsRightsConnectorBeanTest {
             "<group>krabs</group>" +
             "<password>hunter2</password>" +
             "</authTriple>";
-        final ForsRightsConnectorBean bean = new ForsRightsConnectorBean();
-        bean.service = mockedForsRightsService;
-        Response response = bean.authenticate(authDataXml);
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        Response response = authenticatorBean.authenticate(authDataXml);
 
         assertThat("response 401 unauthorised", response.getStatus(), is(401));
+    }
+
+    private AuthenticatorBean getAuthenticatorBean() {
+        final AuthenticatorBean authenticatorBean = new AuthenticatorBean();
+        final ForsRightsConnectorBean forsRightsConnectorBean =
+            new ForsRightsConnectorBean();
+        forsRightsConnectorBean.service = mockedForsRightsService;
+        authenticatorBean.forsRightsConnectorBean = forsRightsConnectorBean;
+        return authenticatorBean;
     }
 
     private ForsRightsResponse getForsRightsResponseOK() {
