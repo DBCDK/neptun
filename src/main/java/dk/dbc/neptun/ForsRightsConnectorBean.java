@@ -45,6 +45,9 @@ public class ForsRightsConnectorBean {
         if(error != null) {
             if(error == ErrorType.AUTHENTICATION_ERROR ||
                     error == ErrorType.USER_NOT_FOUND) {
+                LOGGER.info(String.format("authentication failed for " +
+                    "user/group %s/%s with error %s", user, group,
+                    error.value()));
                 return false;
             } else {
                 throw new ForsRightsConnectorException(String.format(
