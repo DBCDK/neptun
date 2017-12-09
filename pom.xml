@@ -8,9 +8,16 @@
     <version>0.1.0</version>
 
     <properties>
+        <hamcrest.version>1.3</hamcrest.version>
         <jackson.version>2.8.8</jackson.version>
         <javaee.api.version>7.0</javaee.api.version>
+        <jaxws.version>2.5</jaxws.version>
+        <jersey.version>2.22.2</jersey.version>
+        <junit.version>5.0.2</junit.version>
+        <maven.surefire.version>2.20.1</maven.surefire.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
+        <mockito.version>2.12.0</mockito.version>
+        <serviceutils.version>0.1-SNAPSHOT</serviceutils.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
@@ -39,7 +46,52 @@
                     </webResources>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>${jaxws.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>forsrights.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <wsdlLocation>META-INF/wsdl/forsrights.wsdl</wsdlLocation>
+                            <wsdlDirectory>${basedir}/src/main/resources/wsdl</wsdlDirectory>
+                            <packageName>dk.dbc.forsrights.service</packageName>
+                            <staleFile>${project.build.directory}/jaxws/stale/forsrights.stale</staleFile>
+                        </configuration>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <vmArgs>
+                        <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+                    </vmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+                <configuration>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                </configuration>
+            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <targetPath>META-INF/wsdl</targetPath>
+                <directory>${basedir}/src/main/resources/wsdl</directory>
+                <includes>
+                    <include>*.wsdl</include>
+                    <include>*.xsd</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
     <dependencies>
         <dependency>
@@ -62,6 +114,41 @@
             <artifactId>javaee-api</artifactId>
             <version>${javaee.api.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dk.dbc</groupId>
+            <artifactId>serviceutils</artifactId>
+            <version>${serviceutils.version}</version>
         </dependency>
     </dependencies>
 </project>
