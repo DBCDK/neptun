@@ -9,6 +9,8 @@ import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,12 +20,13 @@ public class AuthenticatorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(
         AuthenticatorBean.class);
 
-    public static final String AUTHENTICATE = "authenticate";
+    public static final String AUTHENTICATE = "authenticate/version/{version}";
 
     @Resource(lookup = "java:app/env/url/forsrights")
     private String FORSRIGHTS_ENDPOINT;
 
     @EJB ForsRightsConnectorBean forsRightsConnectorBean;
+    @EJB ConfigFilesHandlerBean configFilesHandlerBean;
 
     /**
      * looks up user rights in forsrights based on a netpunkt triple:
@@ -35,8 +38,9 @@ public class AuthenticatorBean {
      */
     @POST
     @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(AUTHENTICATE)
-    public Response authenticate(String authDataXml) {
+    public Response authenticate(String authDataXml, @PathParam("version") int version) {
         try {
             AuthTriple authTriple = forsRightsConnectorBean
                 .parseAuthXml(authDataXml);
@@ -45,7 +49,13 @@ public class AuthenticatorBean {
                     authTriple.getUser(), authTriple.getGroup(),
                     authTriple.getPassword());
             if(authorized) {
-                return Response.ok().build();
+                try {
+                    return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
+                } catch(ConfigFilesHandlerException e) {
+                    LOGGER.error("unexpected error when finding config files", e);
+                    return Response.serverError().entity(
+                        "unexpected error when finding config files").build();
+                }
             } else {
                 // 401 Unauthorized: auth credentials refused
                 return Response.status(401).build();
