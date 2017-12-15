@@ -8,4 +8,10 @@
             jndi-name="java:app/env/url/forsrights">
         <property name="value" value="${ENV=URL_FORSRIGHTS}"/>
     </custom-resource>
+    <custom-resource
+            factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory"
+            res-type="java.lang.String"
+            jndi-name="java:app/env/config_directory">
+        <property name="value" value="/payara-micro/dbckat.d"/>
+    </custom-resource>
 </resources>
