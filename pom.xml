@@ -21,6 +21,13 @@
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>mavenrepo.dbc.dk</id>
+            <url>http://mavenrepo.dbc.dk/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <build>
         <finalName>neptun</finalName>
         <plugins>
