@@ -29,6 +29,9 @@ public class ForsRightsConnectorBean {
 
     public boolean isUserAuthorized(String baseUrl, String user,
             String group, String password) throws ForsRightsConnectorException {
+        if (baseUrl != null && !baseUrl.endsWith("/")) {
+            baseUrl += "/";
+        }
         ForsRightsPortType port = service.getForsRightsPortType();
         BindingProvider bindingProvider =
             (BindingProvider) port;
