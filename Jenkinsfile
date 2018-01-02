@@ -58,6 +58,9 @@ pipeline {
 			}
 		}
 		stage("deploy staging") {
+			when {
+				branch "master"
+			}
 			steps {
 				deploy("staging")
 			}
