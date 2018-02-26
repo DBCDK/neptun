@@ -1,4 +1,4 @@
-FROM docker.dbc.dk/payara-micro
+FROM docker.dbc.dk/dbc-payara-micro-logback:5
 
 USER root
 RUN apt-get update && apt-get install -y subversion zip
