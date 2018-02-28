@@ -12,6 +12,6 @@
             factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory"
             res-type="java.lang.String"
             jndi-name="java:app/env/config_directory">
-        <property name="value" value="/payara-micro/dbckat.d"/>
+        <property name="value" value="${ENV=CONFIG_DIR}"/>
     </custom-resource>
 </resources>
