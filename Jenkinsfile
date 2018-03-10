@@ -1,6 +1,7 @@
 #!groovy
 
 def workerNode = "devel8"
+def configFileBranches = ["master", "develop"]
 
 void deploy(String deployEnvironment) {
 	dir("deploy") {
@@ -11,7 +12,7 @@ void deploy(String deployEnvironment) {
 		. bin/activate
 		pip3 install --upgrade pip
 		pip3 install -U -e \"git+https://github.com/DBCDK/mesos-tools.git#egg=mesos-tools\"
-		marathon-config-producer neptun-${deployEnvironment} --root deploy/marathon --template-keys BUILD_NUMBER=${env.BUILD_NUMBER} -o neptun-service-${deployEnvironment}.json
+		marathon-config-producer neptun-${deployEnvironment} --root deploy/marathon --template-keys DOCKER_TAG=${env.BRANCH_NAME}-${env.BUILD_NUMBER} -o neptun-service-${deployEnvironment}.json
 		marathon-deployer -a ${MARATHON_TOKEN} -b https://mcp1.dbc.dk:8443 deploy neptun-service-${deployEnvironment}.json
 	"""
 }
@@ -52,7 +53,15 @@ pipeline {
 		stage("docker build") {
 			steps {
 				script {
-					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BUILD_NUMBER}")
+					configFileBranches.each {
+						dir("config-files/${it}/tmp") {
+							git(url: "gitlab@git-platform.dbc.dk:metascrum/dbckat-config-files.git",
+								credentialsId: "gitlab-meta", branch: it)
+							// TODO: structure versioning with git tags
+							sh "zip -r ../1.zip * && rm -rf ../tmp"
+						}
+					}
+					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
 					image.push()
 				}
 			}
