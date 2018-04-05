@@ -58,8 +58,9 @@ pipeline {
 							git(url: "gitlab@git-platform.dbc.dk:metascrum/dbckat-config-files.git",
 								credentialsId: "gitlab-meta", branch: it)
 							// TODO: structure versioning with git tags
-							sh "zip -r ../1.zip * && rm -rf ../tmp"
+							sh "zip -r ../1.zip *"
 						}
+						sh "rm -rf config-files/${it}/tmp"
 					}
 					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
 					image.push()
