@@ -8,6 +8,7 @@ import java.io.File;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,6 +54,32 @@ public class AuthenticatorBeanTest extends AbstractForsRightsConnectorTest {
         Response response = authenticatorBean.authenticate(authDataXml, 10);
 
         assertThat("response 401 unauthorised", response.getStatus(), is(401));
+    }
+
+    @Test
+    public void test_parseAuthHeader() throws ConfigFilesHandlerException, AuthParseException {
+        final String base64Auth = "c3BvbmdlYm9iOmJhcm5hY2xlcw==";
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        final AuthenticatorBean.AuthTuple authTuple =
+            authenticatorBean.parseAuthHeader(base64Auth);
+        assertThat("username", authTuple.getUsername(), is("spongebob"));
+        assertThat("password", authTuple.getPassword(), is("barnacles"));
+    }
+
+    @Test
+    public void test_parseAuthHeaderInvalidData() throws ConfigFilesHandlerException {
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        final String invalidBase64 = "MOOOO\u1f42e";
+        assertThrows(AuthParseException.class,
+            () -> authenticatorBean.parseAuthHeader(invalidBase64));
+    }
+
+    @Test
+    public void test_parseAuthHeaderColonlessData() throws ConfigFilesHandlerException {
+        final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
+        final String colonlessBase64 = "c3BvbmdlYm9iCg==";
+        assertThrows(AuthParseException.class,
+            () -> authenticatorBean.parseAuthHeader(colonlessBase64));
     }
 
     private AuthenticatorBean getAuthenticatorBean() throws ConfigFilesHandlerException {

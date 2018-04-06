@@ -7,12 +7,18 @@ import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Stateless
 @Path("")
@@ -21,12 +27,14 @@ public class AuthenticatorBean {
         AuthenticatorBean.class);
 
     public static final String AUTHENTICATE = "authenticate/version/{version}";
+    public static final String AUTHENTICATE_AD = "authenticate/ad/version/{version}";
 
     @Resource(lookup = "java:app/env/url/forsrights")
     private String FORSRIGHTS_ENDPOINT;
 
     @EJB ForsRightsConnectorBean forsRightsConnectorBean;
     @EJB ConfigFilesHandlerBean configFilesHandlerBean;
+    @EJB SmaugConnectorBean smaugConnectorBean;
 
     /**
      * looks up user rights in forsrights based on a netpunkt triple:
@@ -63,6 +71,72 @@ public class AuthenticatorBean {
         } catch (ForsRightsConnectorException e) {
             LOGGER.error("unexpected exception when authorising user", e);
             return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Path(AUTHENTICATE_AD)
+    public Response authenticateAD(@Context HttpHeaders headers) {
+        final List<String> authHeader = headers.getRequestHeader(
+            HttpHeaders.AUTHORIZATION);
+        if(authHeader == null || authHeader.size() != 1) {
+            return Response.serverError().entity(
+                "missing authorization header").build();
+        }
+        if(authHeader.get(0).length() < 7) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                "malformed authorization header").build();
+        }
+        try {
+            // take substring 6 to get data after "basic "
+            final AuthTuple auth = parseAuthHeader(authHeader.get(0)
+                .substring(6));
+            final boolean authenticated = smaugConnectorBean.authenticate(
+                auth.getUsername(), auth.getPassword());
+            if(authenticated) {
+                return Response.ok().build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+        } catch (AuthParseException e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    protected AuthTuple parseAuthHeader(String auth) throws AuthParseException {
+        try {
+            final byte[] authBytes = DatatypeConverter.parseBase64Binary(auth);
+            final String parsedAuth = new String(authBytes,
+                StandardCharsets.UTF_8);
+            final String[] parts = parsedAuth.split(":");
+            if(parts.length != 2) {
+                throw new AuthParseException(String.format("unable to split %s",
+                    parsedAuth));
+            }
+            final String username = parts[0];
+            final String password = parts[1];
+            return new AuthTuple(username, password);
+        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+            throw new AuthParseException(String.format("unable to parse %s",
+                auth), e);
+        }
+    }
+
+    class AuthTuple {
+        private String username;
+        private String password;
+        public AuthTuple(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
         }
     }
 }

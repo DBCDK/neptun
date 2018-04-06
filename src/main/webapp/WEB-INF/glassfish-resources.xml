@@ -14,4 +14,22 @@
             jndi-name="java:app/env/config_directory">
         <property name="value" value="${ENV=CONFIG_DIR}"/>
     </custom-resource>
+    <custom-resource
+            factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory"
+            res-type="java.lang.String"
+            jndi-name="java:app/env/url/smaug">
+        <property name="value" value="${ENV=SMAUG_URL}"/>
+    </custom-resource>
+    <custom-resource
+            factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory"
+            res-type="java.lang.String"
+            jndi-name="java:app/env/smaugclientid">
+        <property name="value" value="${ENV=SMAUG_CLIENT_ID}"/>
+    </custom-resource>
+    <custom-resource
+            factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory"
+            res-type="java.lang.String"
+            jndi-name="java:app/env/smaugclientsecret">
+        <property name="value" value="${ENV=SMAUG_CLIENT_SECRET}"/>
+    </custom-resource>
 </resources>
