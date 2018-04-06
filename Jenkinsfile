@@ -53,15 +53,21 @@ pipeline {
 		stage("docker build") {
 			steps {
 				script {
-					configFileBranches.each {
-						dir("config-files/${it}/tmp") {
-							git(url: "gitlab@git-platform.dbc.dk:metascrum/dbckat-config-files.git",
-								credentialsId: "gitlab-meta", branch: it)
-							// TODO: structure versioning with git tags
-							sh "zip -r ../1.zip *"
-						}
-						sh "rm -rf config-files/${it}/tmp"
-					}
+					// temporarily disabled because jenkins enters a build loop when the
+					// config files are fetched from this repository
+					//configFileBranches.each {
+					//	dir("config-files/${it}/tmp") {
+					//		git(url: "gitlab@git-platform.dbc.dk:metascrum/dbckat-config-files.git",
+					//			credentialsId: "gitlab-meta", branch: it)
+					//		// TODO: structure versioning with git tags
+					//		sh "zip -r ../1.zip *"
+					//	}
+					//	sh "rm -rf config-files/${it}/tmp"
+					//}
+					sh """
+						curl -LO https://is.dbc.dk/job/neptun/job/dbckat-config-files/lastSuccessfulBuild/artifact/config-files.zip
+						mkdir config-files && unzip config-files.zip -d config-files
+					"""
 					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
 					image.push()
 				}
