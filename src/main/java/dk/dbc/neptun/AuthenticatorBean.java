@@ -77,7 +77,8 @@ public class AuthenticatorBean {
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(AUTHENTICATE_AD)
-    public Response authenticateAD(@Context HttpHeaders headers) {
+    public Response authenticateAD(@Context HttpHeaders headers,
+            @PathParam("version") int version) {
         final List<String> authHeader = headers.getRequestHeader(
             HttpHeaders.AUTHORIZATION);
         if(authHeader == null || authHeader.size() != 1) {
@@ -95,7 +96,13 @@ public class AuthenticatorBean {
             final boolean authenticated = smaugConnectorBean.authenticate(
                 auth.getUsername(), auth.getPassword());
             if(authenticated) {
-                return Response.ok().build();
+                try {
+                    return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
+                } catch(ConfigFilesHandlerException e) {
+                    LOGGER.error("unexpected error when finding config files", e);
+                    return Response.serverError().entity(
+                        "unexpected error when finding config files").build();
+                }
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
