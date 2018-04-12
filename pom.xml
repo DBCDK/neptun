@@ -9,6 +9,7 @@
 
     <properties>
         <hamcrest.version>1.3</hamcrest.version>
+        <httpclient.version>0.1.0</httpclient.version>
         <jackson.version>2.8.8</jackson.version>
         <javaee.api.version>7.0</javaee.api.version>
         <jaxws.version>2.5</jaxws.version>
@@ -150,12 +151,29 @@
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-common</artifactId>
             <version>${jersey.version}</version>
-            <scope>test</scope>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dk.dbc</groupId>
             <artifactId>serviceutils</artifactId>
             <version>${serviceutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.dbc</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
         </dependency>
     </dependencies>
 </project>
