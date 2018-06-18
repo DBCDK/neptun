@@ -28,7 +28,7 @@ pipeline {
 	}
 	triggers {
 		pollSCM("H/03 * * * *")
-		upstream(upstreamProjects: "neptun/dbckat-config-files/master",
+		upstream(upstreamProjects: "neptun/dbckat-config-files/develop",
 			threshold: hudson.model.Result.SUCCESS)
 	}
 	options {
@@ -67,7 +67,7 @@ pipeline {
 					//	sh "rm -rf config-files/${it}/tmp"
 					//}
 					sh """
-						curl -LO https://is.dbc.dk/job/neptun/job/dbckat-config-files/job/master/lastSuccessfulBuild/artifact/config-files.zip
+						curl -LO https://is.dbc.dk/job/neptun/job/dbckat-config-files/job/develop/lastSuccessfulBuild/artifact/config-files.zip
 						mkdir config-files && unzip config-files.zip -d config-files
 					"""
 					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
