@@ -30,7 +30,7 @@ pipeline {
 	}
 	triggers {
 		pollSCM("H/03 * * * *")
-		upstream(upstreamProjects: "neptun/dbckat-config-files/develop",
+		upstream(upstreamProjects: "neptun/dbckat-config-files/develop,neptun/dbckat-config-files/next",
 			threshold: hudson.model.Result.SUCCESS)
 	}
 	options {
@@ -74,6 +74,14 @@ pipeline {
 					"""
 					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
 					image.push()
+
+					sh """
+						rm -rf config-files config-files.zip
+						curl -LO https://is.dbc.dk/job/neptun/job/dbckat-config-files/job/next/lastSuccessfulBuild/artifact/config-files.zip
+						mkdir config-files && unzip config-files.zip -d config-files
+					"""
+					image = docker.build("docker-io.dbc.dk/neptun-service-config-files-next:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
+					image.push()
 				}
 			}
 		}
@@ -95,6 +103,14 @@ pipeline {
 			}
 			steps {
 				deploy("staging")
+			}
+		}
+		stage("deploy next") {
+			when {
+				branch "master"
+			}
+			steps {
+				deploy("next")
 			}
 		}
 	}
