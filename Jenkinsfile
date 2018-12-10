@@ -21,7 +21,7 @@ pipeline {
 	agent {label workerNode}
 	tools {
 		// refers to the name set in manage jenkins -> global tool configuration
-		maven "Maven 3"
+		gradle "gradle-4"
 	}
 	environment {
 		MARATHON_TOKEN = credentials("METASCRUM_MARATHON_TOKEN")
@@ -45,13 +45,13 @@ pipeline {
 		}
 		stage("verify") {
 			steps {
-				sh "mvn verify pmd:pmd"
-				junit "target/surefire-reports/TEST-*.xml,target/failsafe-reports/TEST-*.xml"
+				sh "gradle build pmdMain"
+				junit "build/test-results/test/TEST-*.xml"
 			}
 		}
 		stage("publish pmd results") {
 			steps {
-				step([$class: 'hudson.plugins.pmd.PmdPublisher', checkstyle: 'target/pmd.xml'])
+				step([$class: "hudson.plugins.pmd.PmdPublisher", pattern: "build/reports/pmd/*.xml"])
 			}
 		}
 		stage("docker build") {

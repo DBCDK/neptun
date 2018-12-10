@@ -7,7 +7,7 @@ ENV CONFIG_DIR /payara-micro/dbckat.d/master
 ENV USER gfish
 USER $USER
 
-COPY target/neptun.war wars
+COPY build/libs/neptun.war wars
 
 COPY config-files /payara-micro/dbckat.d
 

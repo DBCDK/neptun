@@ -1,4 +1,6 @@
 *.swp
 *.iml
+.gradle
 .idea
+build
 target
