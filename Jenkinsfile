@@ -3,20 +3,6 @@
 def workerNode = "devel8"
 def configFileBranches = ["master", "develop"]
 
-void deploy(String deployEnvironment) {
-	dir("deploy") {
-		git(url: "gitlab@git-platform.dbc.dk:metascrum/deploy.git", credentialsId: "gitlab-meta")
-	}
-	sh """
-		virtualenv -p python3 .
-		. bin/activate
-		pip3 install --upgrade pip
-		pip3 install -U -e \"git+https://github.com/DBCDK/mesos-tools.git#egg=mesos-tools\"
-		marathon-config-producer neptun-${deployEnvironment} --root deploy/marathon --template-keys DOCKER_TAG=${env.BRANCH_NAME}-${env.BUILD_NUMBER} -o neptun-service-${deployEnvironment}.json
-		marathon-deployer -a ${MARATHON_TOKEN} -b https://mcp1.dbc.dk:8443 deploy neptun-service-${deployEnvironment}.json
-	"""
-}
-
 pipeline {
 	agent {label workerNode}
 	tools {
@@ -101,22 +87,6 @@ pipeline {
 						printf "sonarqube connection failed: %s", e.toString()
 					}
 				}
-			}
-		}
-		stage("deploy staging") {
-			when {
-				branch "master"
-			}
-			steps {
-				deploy("staging")
-			}
-		}
-		stage("deploy next") {
-			when {
-				branch "master"
-			}
-			steps {
-				deploy("next")
 			}
 		}
 	}
