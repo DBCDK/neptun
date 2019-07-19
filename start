@@ -18,7 +18,7 @@ docker run --rm --name neptun -d -p ${neptun_port}:8080 \
     neptun
 attempts=0
 max_attempts=60
-until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/status); do
+until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/neptun/status); do
     if [ ${attempts} -eq ${max_attempts} ]; then
         break
     fi
@@ -30,5 +30,5 @@ done
 
 echo ""
 echo "### Status for neptun service ###"
-curl -vs http://localhost:${neptun_port}/status
+curl -vs http://localhost:${neptun_port}/neptun/status
 echo ""
