@@ -1,14 +1,15 @@
-FROM docker.dbc.dk/payara-micro
+FROM docker.dbc.dk/payara5-micro
 
-USER root
-RUN apt-get update && apt-get install -y zip
+ENV CONFIG_DIR /opt/payara5/deployments/config-files/master
 
-ENV CONFIG_DIR /payara-micro/dbckat.d/master
-ENV USER gfish
-USER $USER
+COPY target/neptun*.war app.json deployments/
 
-COPY build/libs/neptun.war wars
-
-COPY config-files /payara-micro/dbckat.d
+COPY config-files deployments/config-files
 
 EXPOSE 8080
+
+LABEL SMAUG_URL="URL to the smaug service"
+LABEL SMAUG_CLIENT_ID="Smaug client id"
+LABEL SMAUG_CLIENT_SECRET="Smaut client secret"
+LABEL CONFIG_DIR="The config folder"
+LABEL FORSRIGHTS_ENDPOINT="URL to the forsrights service"

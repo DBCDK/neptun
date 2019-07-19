@@ -6,7 +6,6 @@
 package dk.dbc.neptun;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import java.io.File;
 import java.util.stream.IntStream;
@@ -14,15 +13,14 @@ import java.util.stream.Stream;
 
 @Stateless
 public class ConfigFilesHandlerBean {
-    @Resource(lookup = "java:app/env/config_directory")
-    private String CONFDIR;
+    private String CONFIG_DIR = System.getenv().getOrDefault("CONFIG_DIR", "CONFIG_DIR environment variable not set");
 
     protected File confDir;
 
     @PostConstruct
-    private void setup() {
+    public void init() {
         // to facilitate testing, the config directory is instantiated here
-        confDir = new File(CONFDIR);
+        confDir = new File(CONFIG_DIR);
     }
 
     /**

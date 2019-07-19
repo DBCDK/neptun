@@ -1,9 +1,13 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
+ */
+
 package dk.dbc.neptun;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -24,13 +28,12 @@ import java.util.List;
 @Path("")
 public class AuthenticatorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(
-        AuthenticatorBean.class);
+            AuthenticatorBean.class);
 
     public static final String AUTHENTICATE = "authenticate/version/{version}";
     public static final String AUTHENTICATE_AD = "authenticate/ad/version/{version}";
 
-    @Resource(lookup = "java:app/env/url/forsrights")
-    private String FORSRIGHTS_ENDPOINT;
+    private String FORSRIGHTS_URL = System.getenv().getOrDefault("FORSRIGHTS_URL", "FORSRIGHTS_URL environment variable not set");
 
     @EJB ForsRightsConnectorBean forsRightsConnectorBean;
     @EJB ConfigFilesHandlerBean configFilesHandlerBean;
@@ -53,7 +56,7 @@ public class AuthenticatorBean {
             AuthTriple authTriple = forsRightsConnectorBean
                 .parseAuthXml(authDataXml);
             boolean authorized = forsRightsConnectorBean
-                    .isUserAuthorized(FORSRIGHTS_ENDPOINT,
+                    .isUserAuthorized(FORSRIGHTS_URL,
                     authTriple.getUser(), authTriple.getGroup(),
                     authTriple.getPassword());
             if(authorized) {
@@ -130,7 +133,7 @@ public class AuthenticatorBean {
         }
     }
 
-    class AuthTuple {
+    static class AuthTuple {
         private String username;
         private String password;
         public AuthTuple(String username, String password) {

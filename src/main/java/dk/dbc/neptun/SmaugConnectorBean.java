@@ -1,3 +1,8 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
+ */
+
 package dk.dbc.neptun;
 
 import dk.dbc.httpclient.FailSafeHttpClient;
@@ -7,7 +12,6 @@ import net.jodah.failsafe.RetryPolicy;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -19,14 +23,12 @@ import java.util.concurrent.TimeUnit;
 
 @Stateless
 public class SmaugConnectorBean {
-    @Resource(lookup = "java:app/env/url/smaug")
-    private String SMAUG_URL;
 
-    @Resource(lookup = "java:app/env/smaugclientid")
-    private String SMAUG_CLIENT_ID;
+    private String SMAUG_URL = System.getenv().getOrDefault("SMAUG_URL", "SMAUG_URL environment variable not set");
 
-    @Resource(lookup = "java:app/env/smaugclientsecret")
-    private String SMAUG_CLIENT_SECRET;
+    private String SMAUG_CLIENT_ID = System.getenv().getOrDefault("SMAUG_CLIENT_ID", "SMAUG_CLIENT_ID environment variable not set");
+
+    private String SMAUG_CLIENT_SECRET = System.getenv().getOrDefault("SMAUG_CLIENT_SECRET", "SMAUG_CLIENT_SECRET environment variable not set");
 
     private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
         .retryOn(Collections.singletonList(ProcessingException.class))

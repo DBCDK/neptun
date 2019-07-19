@@ -31,16 +31,33 @@ pipeline {
 		}
 		stage("verify") {
 			steps {
-				sh "gradle build pmdMain"
-				junit "build/test-results/test/TEST-*.xml"
+				sh "mvn verify pmd:pmd findbugs:findbugs"
+				junit "**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml"
 			}
 		}
-		stage("publish pmd results") {
+		stage('Warnings') {
 			steps {
-				step([$class: "hudson.plugins.pmd.PmdPublisher", pattern: "build/reports/pmd/*.xml"])
+				warnings consoleParsers: [
+						[parserName: "Java Compiler (javac)"],
+						[parserName: "JavaDoc Tool"]
+				],
+						unstableTotalAll: "0",
+						failedTotalAll: "0"
 			}
 		}
-		stage("docker build") {
+
+		stage('PMD') {
+			steps {
+				step([
+						$class          : 'hudson.plugins.pmd.PmdPublisher',
+						pattern         : '**/target/pmd.xml',
+						unstableTotalAll: "0",
+						failedTotalAll  : "0"
+				])
+			}
+		}
+
+		stage("docker") {
 			steps {
 				script {
 					// temporarily disabled because jenkins enters a build loop when the
