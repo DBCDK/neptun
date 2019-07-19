@@ -16,7 +16,7 @@ pipeline {
 	}
 	triggers {
 		pollSCM("H/03 * * * *")
-		upstream(upstreamProjects: "neptun/dbckat-config-files/develop,neptun/dbckat-config-files/next",
+		upstream(upstreamProjects: "neptun/dbckat-config-files/develop,neptun/dbckat-config-files/next,Docker-payara5/master",
 			threshold: hudson.model.Result.SUCCESS)
 	}
 	options {
