@@ -23,7 +23,7 @@ import java.io.StringReader;
 @Stateless
 public class ForsRightsConnectorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(
-        ForsRightsConnectorBean.class);
+            ForsRightsConnectorBean.class);
 
     protected ForsRightsService service;
 
@@ -33,15 +33,15 @@ public class ForsRightsConnectorBean {
     }
 
     public boolean isUserAuthorized(String baseUrl, String user,
-            String group, String password) throws ForsRightsConnectorException {
+                                    String group, String password) throws ForsRightsConnectorException {
         if (baseUrl != null && !baseUrl.endsWith("/")) {
             baseUrl += "/";
         }
         ForsRightsPortType port = service.getForsRightsPortType();
         BindingProvider bindingProvider =
-            (BindingProvider) port;
+                (BindingProvider) port;
         bindingProvider.getRequestContext().put(
-            BindingProvider.ENDPOINT_ADDRESS_PROPERTY, baseUrl);
+                BindingProvider.ENDPOINT_ADDRESS_PROPERTY, baseUrl);
 
         ForsRightsRequest request = new ForsRightsRequest();
         request.setUserIdAut(user);
@@ -50,17 +50,17 @@ public class ForsRightsConnectorBean {
 
         ForsRightsResponse response = port.forsRights(request);
         ErrorType error = response.getError();
-        if(error != null) {
-            if(error == ErrorType.AUTHENTICATION_ERROR ||
+        if (error != null) {
+            if (error == ErrorType.AUTHENTICATION_ERROR ||
                     error == ErrorType.USER_NOT_FOUND) {
                 LOGGER.info("authentication failed for " +
-                    "user/group {}/{} with error {}", user, group,
-                    error.value());
+                                "user/group {}/{} with error {}", user, group,
+                        error.value());
                 return false;
             } else {
                 throw new ForsRightsConnectorException(String.format(
-                    "error authenticating user/group: %s/%s - %s", user,
-                    group, error.value()));
+                        "error authenticating user/group: %s/%s - %s", user,
+                        group, error.value()));
             }
         } else {
             return response.getRessource().size() > 0;
@@ -72,7 +72,7 @@ public class ForsRightsConnectorBean {
             JAXBContext jaxbContext = JAXBContext.newInstance(AuthTriple.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (AuthTriple) unmarshaller.unmarshal(new StringReader(
-                authXml));
+                    authXml));
         } catch (JAXBException e) {
             throw new ForsRightsConnectorException(e);
         }

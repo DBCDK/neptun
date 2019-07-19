@@ -25,7 +25,7 @@ public class ConfigFilesHandlerBean {
 
     /**
      * Finds a zip file corresponding to the supplied dbckat version.
-     *
+     * <p>
      * Returns the closest match between version and filename so that
      * filename corresponds to [0-9]+\.zip and does not resolve to a number
      * greater than version (ie. version 13 does not get 14.zip).
@@ -33,43 +33,43 @@ public class ConfigFilesHandlerBean {
      * @param targetVersion version of dbckat
      * @return zip of config files
      * @throws ConfigFilesHandlerException on error when matching version
-     * to a filename
+     *                                     to a filename
      */
     public File getConfigFiles(int targetVersion) throws ConfigFilesHandlerException {
         final File[] files = confDir.listFiles();
-        if(files != null) {
+        if (files != null) {
             final int[] versions = Stream.of(files).mapToInt(file -> {
                 int extPos = file.getName().lastIndexOf(".zip");
-                if(extPos == -1) return -1;
+                if (extPos == -1) return -1;
                 try {
                     return Integer.valueOf(file.getName().substring(0, extPos));
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     return -1;
                 }
             }).toArray();
-            if(IntStream.of(versions).noneMatch(i -> i >= 0)) {
+            if (IntStream.of(versions).noneMatch(i -> i >= 0)) {
                 throw new ConfigFilesHandlerException(String.format(
-                    "no zip files found in %s", confDir.getAbsolutePath()));
+                        "no zip files found in %s", confDir.getAbsolutePath()));
             }
             int match = getClosestMatchIndex(targetVersion, versions);
-            if(match >= files.length) {
+            if (match >= files.length) {
                 throw new ConfigFilesHandlerException("index of matched file " +
-                    "exceeds length of file list");
+                        "exceeds length of file list");
             }
             return files[match];
         } else {
             throw new ConfigFilesHandlerException(String.format(
-                "couldn't list files in %s", confDir.getAbsolutePath()));
+                    "couldn't list files in %s", confDir.getAbsolutePath()));
         }
     }
 
     protected int getClosestMatchIndex(int target, int[] versions) {
         int index = 0;
         int diff = Math.abs(target - versions[0]);
-        for(int i = 1; i < versions.length; i++) {
-            if(target < versions[i]) continue;
+        for (int i = 1; i < versions.length; i++) {
+            if (target < versions[i]) continue;
             int newDiff = Math.abs(target - versions[i]);
-            if(newDiff < diff) {
+            if (newDiff < diff) {
                 diff = newDiff;
                 index = i;
             }
