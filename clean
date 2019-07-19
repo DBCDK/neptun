@@ -1,0 +1,7 @@
+echo "### cleaning neptun project ###"
+
+mvn clean
+rm -r config-files
+git pull --ff-only
+docker rm -f neptun &>/dev/null || true
+exit 0

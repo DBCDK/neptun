@@ -1,9 +1,13 @@
+/*
+ * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
+ * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
+ */
+
 package dk.dbc.neptun;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -24,17 +28,19 @@ import java.util.List;
 @Path("")
 public class AuthenticatorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(
-        AuthenticatorBean.class);
+            AuthenticatorBean.class);
 
     public static final String AUTHENTICATE = "authenticate/version/{version}";
     public static final String AUTHENTICATE_AD = "authenticate/ad/version/{version}";
 
-    @Resource(lookup = "java:app/env/url/forsrights")
-    private String FORSRIGHTS_ENDPOINT;
+    private String FORSRIGHTS_URL = System.getenv().getOrDefault("FORSRIGHTS_URL", "FORSRIGHTS_URL environment variable not set");
 
-    @EJB ForsRightsConnectorBean forsRightsConnectorBean;
-    @EJB ConfigFilesHandlerBean configFilesHandlerBean;
-    @EJB SmaugConnectorBean smaugConnectorBean;
+    @EJB
+    ForsRightsConnectorBean forsRightsConnectorBean;
+    @EJB
+    ConfigFilesHandlerBean configFilesHandlerBean;
+    @EJB
+    SmaugConnectorBean smaugConnectorBean;
 
     /**
      * looks up user rights in forsrights based on a netpunkt triple:
@@ -51,18 +57,18 @@ public class AuthenticatorBean {
     public Response authenticate(String authDataXml, @PathParam("version") int version) {
         try {
             AuthTriple authTriple = forsRightsConnectorBean
-                .parseAuthXml(authDataXml);
+                    .parseAuthXml(authDataXml);
             boolean authorized = forsRightsConnectorBean
-                    .isUserAuthorized(FORSRIGHTS_ENDPOINT,
-                    authTriple.getUser(), authTriple.getGroup(),
-                    authTriple.getPassword());
-            if(authorized) {
+                    .isUserAuthorized(FORSRIGHTS_URL,
+                            authTriple.getUser(), authTriple.getGroup(),
+                            authTriple.getPassword());
+            if (authorized) {
                 try {
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
-                } catch(ConfigFilesHandlerException e) {
+                } catch (ConfigFilesHandlerException e) {
                     LOGGER.error("unexpected error when finding config files", e);
                     return Response.serverError().entity(
-                        "unexpected error when finding config files").build();
+                            "unexpected error when finding config files").build();
                 }
             } else {
                 // 401 Unauthorized: auth credentials refused
@@ -78,30 +84,30 @@ public class AuthenticatorBean {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(AUTHENTICATE_AD)
     public Response authenticateAD(@Context HttpHeaders headers,
-            @PathParam("version") int version) {
+                                   @PathParam("version") int version) {
         final List<String> authHeader = headers.getRequestHeader(
-            HttpHeaders.AUTHORIZATION);
-        if(authHeader == null || authHeader.size() != 1) {
+                HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || authHeader.size() != 1) {
             return Response.serverError().entity(
-                "missing authorization header").build();
+                    "missing authorization header").build();
         }
-        if(authHeader.get(0).length() < 7) {
+        if (authHeader.get(0).length() < 7) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                "malformed authorization header").build();
+                    "malformed authorization header").build();
         }
         try {
             // take substring 6 to get data after "basic "
             final AuthTuple auth = parseAuthHeader(authHeader.get(0)
-                .substring(6));
+                    .substring(6));
             final boolean authenticated = smaugConnectorBean.authenticate(
-                auth.getUsername(), auth.getPassword());
-            if(authenticated) {
+                    auth.getUsername(), auth.getPassword());
+            if (authenticated) {
                 try {
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
-                } catch(ConfigFilesHandlerException e) {
+                } catch (ConfigFilesHandlerException e) {
                     LOGGER.error("unexpected error when finding config files", e);
                     return Response.serverError().entity(
-                        "unexpected error when finding config files").build();
+                            "unexpected error when finding config files").build();
                 }
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -115,24 +121,25 @@ public class AuthenticatorBean {
         try {
             final byte[] authBytes = DatatypeConverter.parseBase64Binary(auth);
             final String parsedAuth = new String(authBytes,
-                StandardCharsets.UTF_8);
+                    StandardCharsets.UTF_8);
             final String[] parts = parsedAuth.split(":");
-            if(parts.length != 2) {
+            if (parts.length != 2) {
                 throw new AuthParseException(String.format("unable to split %s",
-                    parsedAuth));
+                        parsedAuth));
             }
             final String username = parts[0];
             final String password = parts[1];
             return new AuthTuple(username, password);
         } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             throw new AuthParseException(String.format("unable to parse %s",
-                auth), e);
+                    auth), e);
         }
     }
 
-    class AuthTuple {
+    static class AuthTuple {
         private String username;
         private String password;
+
         public AuthTuple(String username, String password) {
             this.username = username;
             this.password = password;

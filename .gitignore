@@ -2,5 +2,6 @@
 *.iml
 .gradle
 .idea
-build
 target
+config-files
+config-files.zip
