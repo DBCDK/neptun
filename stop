@@ -1,0 +1,3 @@
+echo "### Stopping neptun docker ###"
+
+docker stop neptun || exit 1

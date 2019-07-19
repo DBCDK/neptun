@@ -1,0 +1,13 @@
+case "$1" in
+    docker)
+        echo "### building neptun docker ###"
+        docker build . -t neptun || exit 1
+        ;;
+
+    *)
+        echo "### building neptun project ###"
+        echo "### Look for build artifacts in target/ ###"
+
+        mvn package -Dmaven.test.skip=true || exit 1
+        ;;
+esac
