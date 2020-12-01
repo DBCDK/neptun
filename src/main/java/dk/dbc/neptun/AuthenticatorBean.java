@@ -55,6 +55,8 @@ public class AuthenticatorBean {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path(AUTHENTICATE)
     public Response authenticate(String authDataXml, @PathParam("version") int version) {
+        LOGGER.info("authenticate/");
+
         try {
             AuthTriple authTriple = forsRightsConnectorBean
                     .parseAuthXml(authDataXml);
@@ -63,6 +65,7 @@ public class AuthenticatorBean {
                             authTriple.getUser(), authTriple.getGroup(),
                             authTriple.getPassword());
             if (authorized) {
+                LOGGER.info("Forsright returned 'authorized'");
                 try {
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
                 } catch (ConfigFilesHandlerException e) {
@@ -72,6 +75,7 @@ public class AuthenticatorBean {
                 }
             } else {
                 // 401 Unauthorized: auth credentials refused
+                LOGGER.info("Forsright returned 'unauthorized'");
                 return Response.status(401).build();
             }
         } catch (ForsRightsConnectorException e) {
@@ -85,6 +89,8 @@ public class AuthenticatorBean {
     @Path(AUTHENTICATE_AD)
     public Response authenticateAD(@Context HttpHeaders headers,
                                    @PathParam("version") int version) {
+        LOGGER.info("authenticateAD/");
+
         final List<String> authHeader = headers.getRequestHeader(
                 HttpHeaders.AUTHORIZATION);
         if (authHeader == null || authHeader.size() != 1) {
@@ -102,6 +108,7 @@ public class AuthenticatorBean {
             final boolean authenticated = smaugConnectorBean.authenticate(
                     auth.getUsername(), auth.getPassword());
             if (authenticated) {
+                LOGGER.info("Smaug returned 'authorized'");
                 try {
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
                 } catch (ConfigFilesHandlerException e) {
@@ -110,6 +117,7 @@ public class AuthenticatorBean {
                             "unexpected error when finding config files").build();
                 }
             } else {
+                LOGGER.info("Smaug returned 'unauthorized'");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (AuthParseException e) {

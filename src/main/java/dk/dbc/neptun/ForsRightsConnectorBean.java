@@ -48,7 +48,9 @@ public class ForsRightsConnectorBean {
         request.setPasswordAut(password);
         request.setGroupIdAut(group);
 
+        LOGGER.info("Sending authentication request to Forsright");
         ForsRightsResponse response = port.forsRights(request);
+        LOGGER.info("Got response from Forsright with error {}", response.getError());
         ErrorType error = response.getError();
         if (error != null) {
             if (error == ErrorType.AUTHENTICATION_ERROR ||
@@ -63,6 +65,7 @@ public class ForsRightsConnectorBean {
                         group, error.value()));
             }
         } else {
+            LOGGER.info("No error, response.getRessource().size() = {}", response.getRessource().size());
             return response.getRessource().size() > 0;
         }
     }
