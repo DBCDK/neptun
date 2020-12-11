@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class AuthenticatorBeanTest extends AbstractForsRightsConnectorTest {
     @Test
     public void test_authenticateOK() throws ConfigFilesHandlerException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseOK()));
 
         final String authDataXml = "<authTriple>" +
@@ -32,7 +32,7 @@ public class AuthenticatorBeanTest extends AbstractForsRightsConnectorTest {
 
     @Test
     public void test_authenticateInvalidXml() throws ConfigFilesHandlerException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseOK()));
         final String authDataXml = "<blah></ok>";
         final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
@@ -43,7 +43,7 @@ public class AuthenticatorBeanTest extends AbstractForsRightsConnectorTest {
 
     @Test
     public void test_authenticateUnauthorised() throws ConfigFilesHandlerException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseUnauthorised()));
         final String authDataXml = "<authTriple>" +
             "<user>eugene</user>" +

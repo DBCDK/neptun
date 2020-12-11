@@ -5,6 +5,10 @@ import dk.dbc.forsrights.service.ForsRightsPortType;
 import dk.dbc.forsrights.service.ForsRightsRequest;
 import dk.dbc.forsrights.service.ForsRightsResponse;
 import dk.dbc.forsrights.service.ForsRightsService;
+import dk.dbc.forsrights.service.LibraryListFromNavisionNameRequest;
+import dk.dbc.forsrights.service.LibraryListFromNavisionNameResponse;
+import dk.dbc.forsrights.service.LibraryListFromServiceNameRequest;
+import dk.dbc.forsrights.service.LibraryListFromServiceNameResponse;
 import dk.dbc.forsrights.service.Ressource;
 
 import javax.xml.ws.Binding;
@@ -69,6 +73,16 @@ public class AbstractForsRightsConnectorTest {
         @Override
         public ForsRightsResponse forsRights(ForsRightsRequest request) {
             return response;
+        }
+
+        @Override
+        public LibraryListFromServiceNameResponse libraryListFromServiceName(LibraryListFromServiceNameRequest parameters) {
+            return null;
+        }
+
+        @Override
+        public LibraryListFromNavisionNameResponse libraryListFromNavisionName(LibraryListFromNavisionNameRequest parameters) {
+            return null;
         }
 
         @Override
