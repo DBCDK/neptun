@@ -6,8 +6,7 @@ def configFileBranches = ["master", "develop"]
 pipeline {
 	agent {label workerNode}
 	tools {
-		// refers to the name set in manage jenkins -> global tool configuration
-		gradle "gradle-4"
+		maven "Maven 3"
 	}
 	environment {
 		MARATHON_TOKEN = credentials("METASCRUM_MARATHON_TOKEN")
