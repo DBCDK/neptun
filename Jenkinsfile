@@ -11,8 +11,6 @@ pipeline {
 	}
 	environment {
 		MARATHON_TOKEN = credentials("METASCRUM_MARATHON_TOKEN")
-		SONARQUBE_HOST = "http://sonarqube.mcp1.dbc.dk"
-		SONARQUBE_TOKEN = credentials("dataio-sonarqube")
 	}
 	triggers {
 		pollSCM("H/03 * * * *")
@@ -85,24 +83,6 @@ pipeline {
 					"""
 					image = docker.build("docker-io.dbc.dk/neptun-service-config-files-next:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
 					image.push()
-				}
-			}
-		}
-		stage("sonarqube") {
-			when {
-				branch "master"
-			}
-			steps {
-				script {
-					try {
-						sh """
-							mvn sonar:sonar \
-							-Dsonar.host.url=$SONARQUBE_HOST \
-							-Dsonar.login=$SONARQUBE_TOKEN
-						"""
-					} catch(e) {
-						printf "sonarqube connection failed: %s", e.toString()
-					}
 				}
 			}
 		}
