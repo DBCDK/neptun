@@ -8,9 +8,6 @@ pipeline {
 	tools {
 		maven "Maven 3"
 	}
-	environment {
-		MARATHON_TOKEN = credentials("METASCRUM_MARATHON_TOKEN")
-	}
 	triggers {
 		pollSCM("H/03 * * * *")
 		upstream(upstreamProjects: "neptun/dbckat-config-files/develop,neptun/dbckat-config-files/next,Docker-payara5-bump-trigger",
