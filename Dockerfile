@@ -4,8 +4,6 @@ ENV CONFIG_DIR /opt/payara5/deployments/config-files/master
 
 COPY target/neptun*.war app.json deployments/
 
-COPY config-files deployments/config-files
-
 EXPOSE 8080
 
 LABEL SMAUG_URL="URL to the smaug service"

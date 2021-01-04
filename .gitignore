@@ -2,6 +2,7 @@
 *.iml
 .gradle
 .idea
+.java-version
 target
 config-files
 config-files.zip

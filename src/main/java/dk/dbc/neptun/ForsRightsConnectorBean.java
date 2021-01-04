@@ -37,7 +37,7 @@ public class ForsRightsConnectorBean {
         if (baseUrl != null && !baseUrl.endsWith("/")) {
             baseUrl += "/";
         }
-        ForsRightsPortType port = service.getForsRightsPortType();
+        ForsRightsPortType port = service.getForsRightsPort();
         BindingProvider bindingProvider =
                 (BindingProvider) port;
         bindingProvider.getRequestContext().put(

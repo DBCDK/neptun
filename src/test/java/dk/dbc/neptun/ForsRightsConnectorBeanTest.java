@@ -36,7 +36,7 @@ public class ForsRightsConnectorBeanTest extends AbstractForsRightsConnectorTest
 
     @Test
     public void test_isUserAuthorised() throws ForsRightsConnectorException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseOK()));
 
         final ForsRightsConnectorBean forsRightsConnectorBean =
@@ -49,7 +49,7 @@ public class ForsRightsConnectorBeanTest extends AbstractForsRightsConnectorTest
 
     @Test
     public void test_isUserAuthorisedNoRights() throws ForsRightsConnectorException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseNoRights()));
 
             final ForsRightsConnectorBean forsRightsConnectorBean =
@@ -62,7 +62,7 @@ public class ForsRightsConnectorBeanTest extends AbstractForsRightsConnectorTest
 
     @Test
     public void test_isUserAuthorisedUnauthorised() throws ForsRightsConnectorException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseUnauthorised()));
 
         final ForsRightsConnectorBean forsRightsConnectorBean =
@@ -75,7 +75,7 @@ public class ForsRightsConnectorBeanTest extends AbstractForsRightsConnectorTest
 
     @Test
     public void test_isUserAuthorisedError() throws ForsRightsConnectorException {
-        when(mockedForsRightsService.getForsRightsPortType()).thenReturn(
+        when(mockedForsRightsService.getForsRightsPort()).thenReturn(
             new MockedForsRightsPort(getForsRightsResponseError()));
 
         final ForsRightsConnectorBean forsRightsConnectorBean =
