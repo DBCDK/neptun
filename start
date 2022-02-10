@@ -14,7 +14,7 @@ docker run --rm --name neptun -d -p ${neptun_port}:8080 \
     -e SMAUG_CLIENT_ID="foo" \
     -e SMAUG_CLIENT_SECRET="bar" \
     -e CONFIG_DIR="/opt/payara5/deployments/config-files/next" \
-    -e FORSRIGHTS_ENDPOINT="http://forsrights.addi.dk/1.2/" \
+    -e IDP_SERVICE_URL="http://idpservice.iscrum-test.svc.cloud.dbc.dk" \
     neptun
 attempts=0
 max_attempts=60

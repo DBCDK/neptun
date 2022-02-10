@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 class SmaugConnectorBeanTest {
     @Test
-    public void test_base64EncodeAuth() {
+    void test_base64EncodeAuth() {
         final SmaugConnectorBean smaugConnectorBean = new SmaugConnectorBean();
         final String username = "spongebob";
         final String password = "barnacles";

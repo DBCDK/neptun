@@ -17,15 +17,9 @@
     <repositories>
         <repository>
             <id>mavenrepo.dbc.dk</id>
-            <url>http://mavenrepo.dbc.dk/content/groups/public/</url>
+            <url>https://mavenrepo.dbc.dk/content/groups/public/</url>
         </repository>
     </repositories>
-
-    <properties>
-        <forsrights.version>2.0</forsrights.version>
-        <forsrights-service.url>https://forsrights.addi.dk/${forsrights.version}</forsrights-service.url>
-        <forsrights-service.local-files>${project.build.directory}/forsrights-service</forsrights-service.local-files>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -41,11 +35,22 @@
             <groupId>dk.dbc</groupId>
             <artifactId>httpclient</artifactId>
             <version>0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.jodah</groupId>
+                    <artifactId>failsafe</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>dk.dbc</groupId>
             <artifactId>serviceutils</artifactId>
             <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.dbc</groupId>
+            <artifactId>idp-connector</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -67,6 +72,14 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -90,92 +103,7 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>${forsrights-service.local-files}</directory>
-            </resource>
-        </resources>
-
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-catalog-file</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${forsrights-service.local-files}/META-INF</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/jax-ws</directory>
-                                    <includes>
-                                        <include>jax-ws-catalog.xml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
-                <artifactId>download-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <id>fetch-forsrights-service-wsdl</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>${forsrights-service.url}/?wsdl</url>
-                            <outputDirectory>${forsrights-service.local-files}/META-INF/wsdl</outputDirectory>
-                            <outputFileName>forsrights.wsdl</outputFileName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>fetch-forsrights-service-xsd</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>${forsrights-service.url}/forsrights.xsd</url>
-                            <outputDirectory>${forsrights-service.local-files}/META-INF/wsdl</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <vmArgs>
-                                <vmArg>-Djavax.xml.accessExternalDTD=all</vmArg>
-                                <vmArg>-Djavax.xml.accessExternalStylesheet=all</vmArg>
-                                <vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-                            </vmArgs>
-                            <target>2.2</target>
-                            <wsdlLocation>http://localhost/wsdl/forsrights.wsdl</wsdlLocation>
-                            <wsdlDirectory>${forsrights-service.local-files}/META-INF/wsdl</wsdlDirectory>
-                            <packageName>dk.dbc.forsrights.service</packageName>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -189,7 +117,6 @@
                 <version>3.2.0</version>
                 <configuration>
                     <nohelp>true</nohelp>
-                    <excludePackageNames>dk.dbc.forsrights.service</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>

@@ -17,24 +17,21 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 @Stateless
 public class SmaugConnectorBean {
 
-    private String SMAUG_URL = System.getenv().getOrDefault("SMAUG_URL", "SMAUG_URL environment variable not set");
+    private static final String SMAUG_URL = System.getenv().getOrDefault("SMAUG_URL", "SMAUG_URL environment variable not set");
+    private static final String SMAUG_CLIENT_ID = System.getenv().getOrDefault("SMAUG_CLIENT_ID", "SMAUG_CLIENT_ID environment variable not set");
+    private static final String SMAUG_CLIENT_SECRET = System.getenv().getOrDefault("SMAUG_CLIENT_SECRET", "SMAUG_CLIENT_SECRET environment variable not set");
 
-    private String SMAUG_CLIENT_ID = System.getenv().getOrDefault("SMAUG_CLIENT_ID", "SMAUG_CLIENT_ID environment variable not set");
-
-    private String SMAUG_CLIENT_SECRET = System.getenv().getOrDefault("SMAUG_CLIENT_SECRET", "SMAUG_CLIENT_SECRET environment variable not set");
-
-    private static final RetryPolicy RETRY_POLICY = new RetryPolicy()
-            .retryOn(Collections.singletonList(ProcessingException.class))
-            .retryIf((Response response) -> response.getStatus() == 404 ||
+    private static final RetryPolicy<Response> RETRY_POLICY = new RetryPolicy<Response>()
+            .handle(ProcessingException.class)
+            .handleResultIf((Response response) -> response.getStatus() == 404 ||
                     response.getStatus() == 500 || response.getStatus() == 502)
-            .withDelay(10, TimeUnit.SECONDS)
+            .withDelay(Duration.ofSeconds(10))
             .withMaxRetries(6);
 
     /**

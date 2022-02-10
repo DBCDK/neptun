@@ -1,15 +1,13 @@
-/*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
- * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
- */
-
 package dk.dbc.neptun;
 
+import dk.dbc.idp.connector.IDPConnector;
+import dk.dbc.idp.connector.IDPConnectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,24 +19,24 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Stateless
 @Path("")
 public class AuthenticatorBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-            AuthenticatorBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticatorBean.class);
 
     public static final String AUTHENTICATE = "authenticate/version/{version}";
     public static final String AUTHENTICATE_AD = "authenticate/ad/version/{version}";
 
-    private String FORSRIGHTS_URL = System.getenv().getOrDefault("FORSRIGHTS_URL", "FORSRIGHTS_URL environment variable not set");
+    @Inject
+    IDPConnector idpConnector;
 
     @EJB
-    ForsRightsConnectorBean forsRightsConnectorBean;
-    @EJB
     ConfigFilesHandlerBean configFilesHandlerBean;
+
     @EJB
     SmaugConnectorBean smaugConnectorBean;
 
@@ -56,13 +54,12 @@ public class AuthenticatorBean {
     @Path(AUTHENTICATE)
     public Response authenticate(String authDataXml, @PathParam("version") int version) {
         try {
-            AuthTriple authTriple = forsRightsConnectorBean
-                    .parseAuthXml(authDataXml);
-            boolean authorized = forsRightsConnectorBean
-                    .isUserAuthorized(FORSRIGHTS_URL,
-                            authTriple.getUser(), authTriple.getGroup(),
-                            authTriple.getPassword());
-            if (authorized) {
+            final AuthTriple authTriple = NetpunktParser.parseAuthXml(authDataXml);
+
+            final boolean authenticated = idpConnector.authenticate(authTriple.getUser(),
+                    authTriple.getGroup(),
+                    authTriple.getPassword());
+            if (authenticated) {
                 try {
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
                 } catch (ConfigFilesHandlerException e) {
@@ -74,7 +71,7 @@ public class AuthenticatorBean {
                 // 401 Unauthorized: auth credentials refused
                 return Response.status(401).build();
             }
-        } catch (ForsRightsConnectorException e) {
+        } catch (IDPConnectorException | JAXBException e) {
             LOGGER.error("unexpected exception when authorising user", e);
             return Response.serverError().build();
         }
