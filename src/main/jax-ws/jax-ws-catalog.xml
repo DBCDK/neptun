@@ -1,8 +1,0 @@
-<!--
-  ~ Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
-  ~ See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
-  -->
-
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-  <system systemId="http://localhost/wsdl/forsrights.wsdl" uri="wsdl/forsrights.wsdl" />
-</catalog>
