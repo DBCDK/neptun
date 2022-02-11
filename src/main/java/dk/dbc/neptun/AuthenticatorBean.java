@@ -9,27 +9,21 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
 
 @Stateless
 @Path("")
 public class AuthenticatorBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticatorBean.class);
-
-    public static final String AUTHENTICATE = "authenticate/version/{version}";
-    public static final String AUTHENTICATE_AD = "authenticate/ad/version/{version}";
 
     @Inject
     IDPConnector idpConnector;
@@ -37,8 +31,6 @@ public class AuthenticatorBean {
     @EJB
     ConfigFilesHandlerBean configFilesHandlerBean;
 
-    @EJB
-    SmaugConnectorBean smaugConnectorBean;
 
     /**
      * looks up user rights in forsrights based on a netpunkt triple:
@@ -51,10 +43,10 @@ public class AuthenticatorBean {
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    @Path(AUTHENTICATE)
+    @Path("authenticate/version/{version}")
     public Response authenticate(String authDataXml, @PathParam("version") int version) {
         try {
-            final AuthTriple authTriple = NetpunktParser.parseAuthXml(authDataXml);
+            final AuthTriple authTriple = parseAuthXml(authDataXml);
 
             final boolean authenticated = idpConnector.authenticate(authTriple.getUser(),
                     authTriple.getGroup(),
@@ -77,77 +69,10 @@ public class AuthenticatorBean {
         }
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    @Path(AUTHENTICATE_AD)
-    public Response authenticateAD(@Context HttpHeaders headers,
-                                   @PathParam("version") int version) {
-        final List<String> authHeader = headers.getRequestHeader(
-                HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || authHeader.size() != 1) {
-            return Response.serverError().entity(
-                    "missing authorization header").build();
-        }
-        if (authHeader.get(0).length() < 7) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    "malformed authorization header").build();
-        }
-        try {
-            // take substring 6 to get data after "basic "
-            final AuthTuple auth = parseAuthHeader(authHeader.get(0)
-                    .substring(6));
-            final boolean authenticated = smaugConnectorBean.authenticate(
-                    auth.getUsername(), auth.getPassword());
-            if (authenticated) {
-                try {
-                    return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
-                } catch (ConfigFilesHandlerException e) {
-                    LOGGER.error("unexpected error when finding config files", e);
-                    return Response.serverError().entity(
-                            "unexpected error when finding config files").build();
-                }
-            } else {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-        } catch (AuthParseException e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        }
+    AuthTriple parseAuthXml(String authXml) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(AuthTriple.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        return (AuthTriple) unmarshaller.unmarshal(new StringReader(authXml));
     }
 
-    protected AuthTuple parseAuthHeader(String auth) throws AuthParseException {
-        try {
-            final byte[] authBytes = DatatypeConverter.parseBase64Binary(auth);
-            final String parsedAuth = new String(authBytes,
-                    StandardCharsets.UTF_8);
-            final String[] parts = parsedAuth.split(":");
-            if (parts.length != 2) {
-                throw new AuthParseException(String.format("unable to split %s",
-                        parsedAuth));
-            }
-            final String username = parts[0];
-            final String password = parts[1];
-            return new AuthTuple(username, password);
-        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-            throw new AuthParseException(String.format("unable to parse %s",
-                    auth), e);
-        }
-    }
-
-    static class AuthTuple {
-        private String username;
-        private String password;
-
-        public AuthTuple(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-    }
 }

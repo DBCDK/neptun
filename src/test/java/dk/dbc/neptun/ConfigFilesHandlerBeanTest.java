@@ -1,7 +1,9 @@
 package dk.dbc.neptun;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 
@@ -14,7 +16,12 @@ import static org.mockito.Mockito.when;
 class ConfigFilesHandlerBeanTest {
 
     @Mock
-    File mockedConfDir = mock(File.class);
+    File mockedConfDir;
+
+    @BeforeEach
+    public void before() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     private class MockConfigFilesHandlerBean extends ConfigFilesHandlerBean {
         public MockConfigFilesHandlerBean() {

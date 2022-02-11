@@ -1,8 +1,3 @@
-/*
- * Copyright Dansk Bibliotekscenter a/s. Licensed under GPLv3
- * See license text in LICENSE.txt or at https://opensource.dbc.dk/licenses/gpl-3.0/
- */
-
 package dk.dbc.neptun;
 
 import javax.annotation.PostConstruct;
@@ -13,7 +8,7 @@ import java.util.stream.Stream;
 
 @Stateless
 public class ConfigFilesHandlerBean {
-    private String CONFIG_DIR = System.getenv().getOrDefault("CONFIG_DIR", "CONFIG_DIR environment variable not set");
+    private static final String CONFIG_DIR = System.getenv().getOrDefault("CONFIG_DIR", "CONFIG_DIR environment variable not set");
 
     protected File confDir;
 
@@ -42,7 +37,7 @@ public class ConfigFilesHandlerBean {
                 int extPos = file.getName().lastIndexOf(".zip");
                 if (extPos == -1) return -1;
                 try {
-                    return Integer.valueOf(file.getName().substring(0, extPos));
+                    return Integer.parseInt(file.getName().substring(0, extPos));
                 } catch (NumberFormatException e) {
                     return -1;
                 }
