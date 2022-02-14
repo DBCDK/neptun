@@ -15,9 +15,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.DataBindingException;
+import javax.xml.bind.JAXB;
+import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 
 @Stateless
@@ -63,16 +63,14 @@ public class AuthenticatorBean {
                 // 401 Unauthorized: auth credentials refused
                 return Response.status(401).build();
             }
-        } catch (IDPConnectorException | JAXBException e) {
+        } catch (IDPConnectorException | DataBindingException e) {
             LOGGER.error("unexpected exception when authorising user", e);
             return Response.serverError().build();
         }
     }
 
-    AuthTriple parseAuthXml(String authXml) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(AuthTriple.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return (AuthTriple) unmarshaller.unmarshal(new StringReader(authXml));
+    AuthTriple parseAuthXml(String authXml) throws DataBindingException {
+        return JAXB.unmarshal(new StreamSource(new StringReader(authXml)), AuthTriple.class);
     }
 
 }

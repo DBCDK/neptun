@@ -13,10 +13,11 @@ docker run --rm --name neptun -d -p ${neptun_port}:8080 \
     -e JAVA_MAX_HEAP_SIZE=2G \
     -e CONFIG_DIR="/opt/payara5/deployments/config-files/next" \
     -e IDP_SERVICE_URL="http://idpservice.iscrum-test.svc.cloud.dbc.dk" \
+    -e IDP_CACHE_AGE="0" \
     neptun
 attempts=0
 max_attempts=60
-until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/neptun/status); do
+until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/health/ready); do
     if [ ${attempts} -eq ${max_attempts} ]; then
         break
     fi
@@ -28,5 +29,5 @@ done
 
 echo ""
 echo "### Status for neptun service ###"
-curl -vs http://localhost:${neptun_port}/neptun/status
+curl -vs http://localhost:${neptun_port}/health/ready
 echo ""

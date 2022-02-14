@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
+import javax.xml.bind.DataBindingException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,7 +77,7 @@ class AuthenticatorBeanTest {
     }
 
     @Test
-    void test_parseAuthXml() throws JAXBException, ConfigFilesHandlerException, IDPConnectorException {
+    void test_parseAuthXml() throws ConfigFilesHandlerException, IDPConnectorException {
         final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
         final String authDataXml = "<authTriple>" +
                 "<user>patrick</user>" +
@@ -96,7 +96,7 @@ class AuthenticatorBeanTest {
         final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
         final String authDataXml = "<blah></ok>";
 
-        assertThrows(JAXBException.class,
+        assertThrows(DataBindingException.class,
                 () -> authenticatorBean.parseAuthXml(authDataXml));
     }
 }
