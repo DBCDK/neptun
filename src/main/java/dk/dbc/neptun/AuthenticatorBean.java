@@ -37,8 +37,9 @@ public class AuthenticatorBean {
      * userid, groupid, password
      *
      * @param authDataXml xml containing userid, groupid, and password
-     * @return 200 OK on authorised users, 401 Unauthorized on unauthorised
-     * users and 500 Server Error on backend exceptions
+     * @param version     the wanted config file version
+     * @return 200 OK on authorised users, 400 Bad Request if the auth body can't be parsed,
+     * 401 Unauthorized on unauthorized users and 500 Server Error on backend exceptions
      */
     @POST
     @Consumes(MediaType.APPLICATION_XML)
@@ -60,12 +61,13 @@ public class AuthenticatorBean {
                             "unexpected error when finding config files").build();
                 }
             } else {
-                // 401 Unauthorized: auth credentials refused
-                return Response.status(401).build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-        } catch (IDPConnectorException | DataBindingException e) {
+        } catch (IDPConnectorException e) {
             LOGGER.error("unexpected exception when authorising user", e);
             return Response.serverError().build();
+        } catch (DataBindingException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid XML body").build();
         }
     }
 

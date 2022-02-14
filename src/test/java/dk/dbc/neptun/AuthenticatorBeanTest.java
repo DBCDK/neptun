@@ -49,7 +49,7 @@ class AuthenticatorBeanTest {
         final AuthenticatorBean authenticatorBean = getAuthenticatorBean();
         Response response = authenticatorBean.authenticate(authDataXml, 10);
 
-        assertThat("response 500 server error", response.getStatus(), is(500));
+        assertThat("response 400 bad request", response.getStatus(), is(400));
     }
 
     @Test
