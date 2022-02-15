@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ./stop || true
 ./build docker || exit 1
 
