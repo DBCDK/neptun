@@ -22,6 +22,6 @@ public class Neptun extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return CLASSES;
+        return new HashSet<>(CLASSES);
     }
 }
