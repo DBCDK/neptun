@@ -33,7 +33,7 @@ public class AuthenticatorBean {
 
 
     /**
-     * looks up user rights in forsrights based on a netpunkt triple:
+     * Looks up user rights in identity provider service based on a netpunkt triple:
      * userid, groupid, password
      *
      * @param authDataXml xml containing userid, groupid, and password
