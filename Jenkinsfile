@@ -5,58 +5,56 @@ def workerNode = "devel10"
 pipeline {
 	agent {label workerNode}
 	tools {
+	    jdk 'jdk11'
 		maven "Maven 3"
 	}
 	triggers {
-		pollSCM("H/03 * * * *")
 		upstream(upstreamProjects: "Docker-payara5-bump-trigger",
 			threshold: hudson.model.Result.SUCCESS)
 	}
 	options {
 		timestamps()
 	}
-	stages {
-		stage("clear workspace") {
-			steps {
-				deleteDir()
-				checkout scm
-			}
-		}
-		stage("verify") {
-			steps {
-				sh "mvn verify pmd:pmd findbugs:findbugs"
-				junit "**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml"
-			}
-		}
-		stage('Warnings') {
-			steps {
-				warnings consoleParsers: [
-						[parserName: "Java Compiler (javac)"],
-						[parserName: "JavaDoc Tool"]
-				],
-						unstableTotalAll: "0",
-						failedTotalAll: "0"
-			}
-		}
+    stages {
+        stage("clear workspace") {
+            steps {
+                deleteDir()
+                checkout scm
+            }
+        }
+        stage("build") {
+            steps {
+                script {
+                    def status = sh returnStatus: true, script:  """
+                        rm -rf \$WORKSPACE/.repo
+                        mvn -B -Dmaven.repo.local=\$WORKSPACE/.repo dependency:resolve dependency:resolve-plugins >/dev/null || true
+                        mvn -B -Dmaven.repo.local=\$WORKSPACE/.repo clean
+                    """
 
-		stage('PMD') {
-			steps {
-				step([
-						$class          : 'hudson.plugins.pmd.PmdPublisher',
-						pattern         : '**/target/pmd.xml',
-						unstableTotalAll: "0",
-						failedTotalAll  : "0"
-				])
-			}
-		}
+                    // We want code-coverage and pmd/spotbugs even if unittests fails
+                    status += sh returnStatus: true, script:  """
+                        mvn -B -Dmaven.repo.local=\$WORKSPACE/.repo verify pmd:pmd pmd:cpd spotbugs:spotbugs javadoc:aggregate
+                    """
 
-		stage("docker") {
-			steps {
-				script {
-					def image = docker.build("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
-					image.push()
-				}
-			}
-		}
-	}
+                    junit testResults: '**/target/*-reports/*.xml'
+
+                    def java = scanForIssues tool: [$class: 'Java']
+                    def javadoc = scanForIssues tool: [$class: 'JavaDoc']
+                    publishIssues issues:[java, javadoc], unstableTotalAll:1
+
+                    def pmd = scanForIssues tool: [$class: 'Pmd']
+                    publishIssues issues:[pmd], unstableTotalAll:1
+
+                    def spotbugs = scanForIssues tool: [$class: 'SpotBugs']
+                    publishIssues issues:[spotbugs], unstableTotalAll:1
+
+                    if (status != 0) {
+                        error("build failed")
+                    } else {
+                        docker.image("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
+                    }
+                }
+            }
+        }
+    }
 }

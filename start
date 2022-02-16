@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ./stop || true
 ./build docker || exit 1
 
@@ -9,16 +11,15 @@ mkdir config-files && unzip config-files.zip -d config-files
 
 neptun_port=${NEPTUN_PORT:-8080}
 docker run --rm --name neptun -d -p ${neptun_port}:8080 \
+    -v ${PWD}/config-files/next:/opt/payara5/deployments/config-files/next \
     -e JAVA_MAX_HEAP_SIZE=2G \
-    -e SMAUG_URL="http://smaug.meta.staging.mcp1.dbc.dk" \
-    -e SMAUG_CLIENT_ID="foo" \
-    -e SMAUG_CLIENT_SECRET="bar" \
     -e CONFIG_DIR="/opt/payara5/deployments/config-files/next" \
-    -e FORSRIGHTS_ENDPOINT="http://forsrights.addi.dk/1.2/" \
-    neptun
+    -e IDP_SERVICE_URL="http://idpservice.iscrum-test.svc.cloud.dbc.dk" \
+    -e IDP_CACHE_AGE="0" \
+    docker-io.dbc.dk/neptun-service:devel
 attempts=0
 max_attempts=60
-until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/neptun/status); do
+until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/health/ready); do
     if [ ${attempts} -eq ${max_attempts} ]; then
         break
     fi
@@ -30,5 +31,5 @@ done
 
 echo ""
 echo "### Status for neptun service ###"
-curl -vs http://localhost:${neptun_port}/neptun/status
+curl -vs http://localhost:${neptun_port}/health/ready
 echo ""

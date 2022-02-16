@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "### testing neptun project ###"
 
 mvn verify || exit 1

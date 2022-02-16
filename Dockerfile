@@ -6,8 +6,6 @@ COPY target/neptun*.war app.json deployments/
 
 EXPOSE 8080
 
-LABEL SMAUG_URL="URL to the smaug service"
-LABEL SMAUG_CLIENT_ID="Smaug client id"
-LABEL SMAUG_CLIENT_SECRET="Smaut client secret"
 LABEL CONFIG_DIR="The config folder"
-LABEL FORSRIGHTS_URL="URL to the forsrights service"
+LABEL IDP_SERVICE_URL="URL to the identity provider service"
+LABEL IDP_CACHE_AGE="Amount of time in hours to cache the results from the identity provider service"
