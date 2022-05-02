@@ -1,6 +1,6 @@
 #!groovy
 
-def workerNode = "devel8"
+def workerNode = "devel10"
 def configFileBranches = ["master", "develop"]
 
 pipeline {
