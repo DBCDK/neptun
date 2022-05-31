@@ -16,7 +16,7 @@ docker run --rm --name neptun -d -p ${neptun_port}:8080 \
     -e CONFIG_DIR="/opt/payara5/deployments/config-files/next" \
     -e IDP_SERVICE_URL="http://idpservice.iscrum-test.svc.cloud.dbc.dk" \
     -e IDP_CACHE_AGE="0" \
-    docker-io.dbc.dk/neptun-service:devel
+    docker-metascrum.artifacts.dbccloud.dk/neptun-service:devel
 attempts=0
 max_attempts=60
 until $(curl --output /dev/null --silent --head --fail http://localhost:${neptun_port}/health/ready); do

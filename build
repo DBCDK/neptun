@@ -5,9 +5,9 @@ case "$1" in
         echo "### building neptun docker ###"
         if [[ ! -z "$BUILD_NUMBER" ]];
         then
-            docker build . --pull --no-cache -t docker-io.dbc.dk/neptun-service:${BRANCH_NAME}-${BUILD_NUMBER} || exit 1
+            docker build . --pull --no-cache -t docker-metascrum.artifacts.dbccloud.dk/neptun-service:${BRANCH_NAME}-${BUILD_NUMBER} || exit 1
         else
-            docker build . -t docker-io.dbc.dk/neptun-service:devel || exit 1
+            docker build . -t docker-metascrum.artifacts.dbccloud.dk/neptun-service:devel || exit 1
         fi
         ;;
 

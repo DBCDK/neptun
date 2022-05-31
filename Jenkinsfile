@@ -51,7 +51,7 @@ pipeline {
                     if (status != 0) {
                         error("build failed")
                     } else {
-                        docker.image("docker-io.dbc.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
+                        docker.image("docker-metascrum.artifacts.dbccloud.dk/neptun-service:${env.BRANCH_NAME}-${env.BUILD_NUMBER}").push()
                     }
                 }
             }
