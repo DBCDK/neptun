@@ -1,7 +1,6 @@
 package dk.dbc.neptun.rest;
 
 import dk.dbc.neptun.AuthenticatorBean;
-import dk.dbc.neptun.Status;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.ApplicationPath;
@@ -18,7 +17,7 @@ import static java.util.Arrays.asList;
 @ApplicationPath("/neptun")
 public class Neptun extends Application {
     private static final Set<Class<?>> CLASSES = new HashSet<>(asList(
-            AuthenticatorBean.class, JacksonFeature.class, Status.class
+            AuthenticatorBean.class, JacksonFeature.class
     ));
 
     @Override
