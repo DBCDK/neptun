@@ -2,13 +2,12 @@ package dk.dbc.neptun;
 
 import dk.dbc.idp.connector.IDPConnector;
 import dk.dbc.idp.connector.IDPConnectorException;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.DataBindingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import javax.ws.rs.core.Response;
-import javax.xml.bind.DataBindingException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

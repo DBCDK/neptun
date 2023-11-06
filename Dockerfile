@@ -1,4 +1,4 @@
-FROM docker.dbc.dk/payara5-micro
+FROM docker-dbc.artifacts.dbccloud.dk/payara6-micro:latest
 
 ENV CONFIG_DIR /opt/payara5/deployments/config-files/master
 

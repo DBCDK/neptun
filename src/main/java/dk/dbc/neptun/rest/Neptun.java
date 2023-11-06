@@ -1,14 +1,11 @@
 package dk.dbc.neptun.rest;
 
 import dk.dbc.neptun.AuthenticatorBean;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-import java.util.HashSet;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 /**
  * This class defines the other classes that make up this JAX-RS application by
@@ -16,12 +13,10 @@ import static java.util.Arrays.asList;
  */
 @ApplicationPath("/neptun")
 public class Neptun extends Application {
-    private static final Set<Class<?>> CLASSES = new HashSet<>(asList(
-            AuthenticatorBean.class, JacksonFeature.class
-    ));
+    private static final Set<Class<?>> CLASSES = Set.of(AuthenticatorBean.class, JacksonFeature.class);
 
     @Override
     public Set<Class<?>> getClasses() {
-        return new HashSet<>(CLASSES);
+        return CLASSES;
     }
 }
