@@ -1,7 +1,7 @@
 package dk.dbc.neptun;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.Stateless;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.Stateless;
 import java.io.File;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
