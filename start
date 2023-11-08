@@ -11,9 +11,9 @@ mkdir config-files && unzip config-files.zip -d config-files
 
 neptun_port=${NEPTUN_PORT:-8080}
 docker run --rm --name neptun -d -p ${neptun_port}:8080 \
-    -v ${PWD}/config-files/next:/opt/payara5/deployments/config-files/next \
+    -v ${PWD}/config-files/next:/opt/payara6/deployments/config-files/next \
     -e JAVA_MAX_HEAP_SIZE=2G \
-    -e CONFIG_DIR="/opt/payara5/deployments/config-files/next" \
+    -e CONFIG_DIR="/opt/payara6/deployments/config-files/next" \
     -e IDP_SERVICE_URL="http://idpservice.iscrum-test.svc.cloud.dbc.dk" \
     -e IDP_CACHE_AGE="0" \
     docker-metascrum.artifacts.dbccloud.dk/neptun-service:devel
