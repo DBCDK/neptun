@@ -1,6 +1,6 @@
 FROM docker-dbc.artifacts.dbccloud.dk/payara6-micro:latest
 
-ENV CONFIG_DIR /opt/payara5/deployments/config-files/master
+ENV CONFIG_DIR /opt/payara6/deployments/config-files/master
 
 COPY target/neptun*.war app.json deployments/
 
