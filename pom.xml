@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <sonar.projectKey>rawrepo-v2</sonar.projectKey>
+        <sonar.projectKey>Neptun</sonar.projectKey>
         <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
     </properties>
 
