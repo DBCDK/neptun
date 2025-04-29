@@ -42,7 +42,7 @@ pipeline {
 
                         // Do sonar via maven
                         status += sh returnStatus: true, script: """
-                            mvn -e -X -B $sonarOptions sonar:sonar
+                            mvn -B $sonarOptions sonar:sonar
                         """
 
                         if (status != 0) {
