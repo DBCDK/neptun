@@ -14,7 +14,7 @@ pipeline {
     environment {
         SONAR_SCANNER_HOME = tool 'SonarQube Scanner from Maven Central'
         SONAR_SCANNER = "$SONAR_SCANNER_HOME/bin/sonar-scanner"
-        SONAR_PROJECT_KEY = "rawrepo-v2"
+        SONAR_PROJECT_KEY = "neptun"
         SONAR_SOURCES="src"
         SONAR_TESTS="test"
     }
