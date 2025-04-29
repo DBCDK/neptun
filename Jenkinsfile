@@ -11,6 +11,13 @@ pipeline {
 		upstream(upstreamProjects: "Docker-payara6-bump-trigger",
 			threshold: hudson.model.Result.SUCCESS)
 	}
+    environment {
+        SONAR_SCANNER_HOME = tool 'SonarQube Scanner from Maven Central'
+        SONAR_SCANNER = "$SONAR_SCANNER_HOME/bin/sonar-scanner"
+        SONAR_PROJECT_KEY = "rawrepo-v2"
+        SONAR_SOURCES="src"
+        SONAR_TESTS="test"
+    }
 	options {
 		timestamps()
 	}
