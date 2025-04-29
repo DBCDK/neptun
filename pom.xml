@@ -6,7 +6,7 @@
     <groupId>dk.dbc.neptun</groupId>
     <artifactId>neptun</artifactId>
     <packaging>war</packaging>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <parent>
         <groupId>dk.dbc</groupId>
@@ -15,10 +15,15 @@
         <relativePath/>
     </parent>
 
+    <properties>
+        <sonar.projectKey>Neptun</sonar.projectKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+    </properties>
+
     <repositories>
         <repository>
             <id>mavenrepo.dbc.dk</id>
-            <url>https://mavenrepo.dbc.dk/content/groups/public/</url>
+            <url>https://mavenrepo.dbc.dk/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 

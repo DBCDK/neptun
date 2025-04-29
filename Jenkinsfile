@@ -1,6 +1,7 @@
 #!groovy
 
-def workerNode = "devel12"
+def workerNode = "devel11"
+
 
 pipeline {
 	agent {label workerNode}
@@ -11,6 +12,13 @@ pipeline {
 		upstream(upstreamProjects: "Docker-payara6-bump-trigger",
 			threshold: hudson.model.Result.SUCCESS)
 	}
+    environment {
+        SONAR_SCANNER_HOME = tool 'SonarQube Scanner from Maven Central'
+        SONAR_SCANNER = "$SONAR_SCANNER_HOME/bin/sonar-scanner"
+        SONAR_PROJECT_KEY = "neptun"
+        SONAR_SOURCES="src"
+        SONAR_TESTS="test"
+    }
 	options {
 		timestamps()
 	}
@@ -23,6 +31,25 @@ pipeline {
         }
         stage("build") {
             steps {
+                withSonarQubeEnv(installationName: 'sonarqube.dbc.dk') {
+                    script {
+                        def status = 0
+
+                        def sonarOptions = "-Dsonar.branch.name=${BRANCH_NAME}"
+                        if (env.BRANCH_NAME != 'master') {
+                            sonarOptions += " -Dsonar.newCode.referenceBranch=master"
+                        }
+
+                        // Do sonar via maven
+                        status += sh returnStatus: true, script: """
+                            mvn -B $sonarOptions sonar:sonar
+                        """
+
+                        if (status != 0) {
+                            error("build failed")
+                        }
+                    }
+                }
                 script {
                     def status = sh returnStatus: true, script:  """
                         rm -rf \$WORKSPACE/.repo
