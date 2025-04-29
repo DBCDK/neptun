@@ -6,19 +6,24 @@
     <groupId>dk.dbc.neptun</groupId>
     <artifactId>neptun</artifactId>
     <packaging>war</packaging>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <parent>
         <groupId>dk.dbc</groupId>
         <artifactId>microservice-pom</artifactId>
-        <version>java11-SNAPSHOT</version>
+        <version>java17-SNAPSHOT</version>
         <relativePath/>
     </parent>
+
+    <properties>
+        <sonar.projectKey>rawrepo-v2</sonar.projectKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+    </properties>
 
     <repositories>
         <repository>
             <id>mavenrepo.dbc.dk</id>
-            <url>https://mavenrepo.dbc.dk/content/groups/public/</url>
+            <url>https://mavenrepo.dbc.dk/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 

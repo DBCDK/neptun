@@ -1,11 +1,10 @@
 #!groovy
 
-def workerNode = "devel10"
+def workerNode = "devel12"
 
 pipeline {
 	agent {label workerNode}
 	tools {
-	    jdk 'jdk11'
 		maven "Maven 3"
 	}
 	triggers {
@@ -24,6 +23,25 @@ pipeline {
         }
         stage("build") {
             steps {
+                withSonarQubeEnv(installationName: 'sonarqube.dbc.dk') {
+                    script {
+                        def status = 0
+
+                        def sonarOptions = "-Dsonar.branch.name=${BRANCH_NAME}"
+                        if (env.BRANCH_NAME != 'master') {
+                            sonarOptions += " -Dsonar.newCode.referenceBranch=master"
+                        }
+
+                        // Do sonar via maven
+                        status += sh returnStatus: true, script: """
+                            mvn -B $sonarOptions -pl '!debian' sonar:sonar
+                        """
+
+                        if (status != 0) {
+                            error("build failed")
+                        }
+                    }
+                }
                 script {
                     def status = sh returnStatus: true, script:  """
                         rm -rf \$WORKSPACE/.repo

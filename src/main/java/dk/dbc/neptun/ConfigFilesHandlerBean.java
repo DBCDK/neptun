@@ -23,7 +23,7 @@ public class ConfigFilesHandlerBean {
      * <p>
      * Returns the closest match between version and filename so that
      * filename corresponds to [0-9]+\.zip and does not resolve to a number
-     * greater than version (ie. version 13 does not get 14.zip).
+     * greater than version (i.e. version 13 does not get 14.zip).
      *
      * @param targetVersion version of dbckat
      * @return zip of config files
