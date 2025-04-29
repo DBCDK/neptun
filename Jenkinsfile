@@ -2,6 +2,7 @@
 
 def workerNode = "devel11"
 
+
 pipeline {
 	agent {label workerNode}
 	tools {
