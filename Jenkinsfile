@@ -42,7 +42,7 @@ pipeline {
 
                         // Do sonar via maven
                         status += sh returnStatus: true, script: """
-                            mvn -B $sonarOptions -pl '!debian' sonar:sonar
+                            mvn -e -X -B $sonarOptions -pl '!debian' sonar:sonar
                         """
 
                         if (status != 0) {
