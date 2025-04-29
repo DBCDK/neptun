@@ -49,11 +49,15 @@ public class AuthenticatorBean {
         try {
             final AuthTriple authTriple = parseAuthXml(authDataXml);
 
+            // It's a bit annoying but must be done here since the idpConnector.authenticate doesn't
+            // log the attempt if found in cache. That makes troubleshooting a bit difficult.
+            LOGGER.info("Auth triple: {} {}", authTriple.getUser(), authTriple.getGroup());
             final boolean authenticated = idpConnector.authenticate(authTriple.getUser(),
                     authTriple.getGroup(),
                     authTriple.getPassword());
             if (authenticated) {
                 try {
+                    LOGGER.info("trying to get {}", version);
                     return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
                 } catch (ConfigFilesHandlerException e) {
                     LOGGER.error("unexpected error when finding config files", e);
@@ -61,6 +65,7 @@ public class AuthenticatorBean {
                             "unexpected error when finding config files").build();
                 }
             } else {
+                LOGGER.info("auth failed");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (IDPConnectorException e) {
