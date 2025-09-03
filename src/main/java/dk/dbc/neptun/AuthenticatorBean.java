@@ -60,7 +60,11 @@ public class AuthenticatorBean {
                 try {
                     LOGGER.info("trying to get {}", version);
                     File ff = configFilesHandlerBean.getConfigFiles(version);
-                    LOGGER.info("Got file {}", ff.getName());
+                    if (ff != null) {
+                        LOGGER.info("Got file {}", ff.getName());
+                    } else {
+                        LOGGER.info("Didn't get file {} ff is null", version);
+                    }
                     return Response.ok(ff).build();
                 } catch (ConfigFilesHandlerException e) {
                     LOGGER.error("unexpected error when finding config files", e);
