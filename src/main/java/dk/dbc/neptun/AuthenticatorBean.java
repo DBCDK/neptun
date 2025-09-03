@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.xml.bind.DataBindingException;
 import jakarta.xml.bind.JAXB;
 import javax.xml.transform.stream.StreamSource;
+import java.io.File;
 import java.io.StringReader;
 
 @Stateless
@@ -58,7 +59,9 @@ public class AuthenticatorBean {
             if (authenticated) {
                 try {
                     LOGGER.info("trying to get {}", version);
-                    return Response.ok(configFilesHandlerBean.getConfigFiles(version)).build();
+                    File ff = configFilesHandlerBean.getConfigFiles(version);
+                    LOGGER.info("Got file {}", ff.getName());
+                    return Response.ok(ff).build();
                 } catch (ConfigFilesHandlerException e) {
                     LOGGER.error("unexpected error when finding config files", e);
                     return Response.serverError().entity(
