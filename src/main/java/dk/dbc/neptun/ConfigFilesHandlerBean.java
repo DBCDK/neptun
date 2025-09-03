@@ -2,6 +2,9 @@ package dk.dbc.neptun;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Stateless;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -9,6 +12,7 @@ import java.util.stream.Stream;
 @Stateless
 public class ConfigFilesHandlerBean {
     private static final String CONFIG_DIR = System.getenv().getOrDefault("CONFIG_DIR", "CONFIG_DIR environment variable not set");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFilesHandlerBean.class);
 
     protected File confDir;
 
@@ -31,6 +35,7 @@ public class ConfigFilesHandlerBean {
      *                                     to a filename
      */
     public File getConfigFiles(int targetVersion) throws ConfigFilesHandlerException {
+        LOGGER.info("Asking for {}", targetVersion);
         final File[] files = confDir.listFiles();
         if (files != null) {
             final int[] versions = Stream.of(files).mapToInt(file -> {
@@ -51,6 +56,7 @@ public class ConfigFilesHandlerBean {
                 throw new ConfigFilesHandlerException("index of matched file " +
                         "exceeds length of file list");
             }
+            LOGGER.info("Got match {} name {}", match, files[match].getName());
             return files[match];
         } else {
             throw new ConfigFilesHandlerException(String.format(
