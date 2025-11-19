@@ -78,6 +78,32 @@ class ConfigFilesHandlerBeanTest {
     }
 
     @Test
+    void test_jira_dbckat_292_fileOrder1() throws ConfigFilesHandlerException {
+        final ConfigFilesHandlerBean configFilesHandlerBean = new MockConfigFilesHandlerBean();
+        final File file1 = mock(File.class);
+        final File file2 = mock(File.class);
+        when(file1.getName()).thenReturn("202400.zip");
+        when(file2.getName()).thenReturn("202500.zip");
+        when(mockedConfDir.listFiles()).thenReturn(new File[]{file1, file2});
+        final File match = configFilesHandlerBean.getConfigFiles(202301);
+
+        assertThat("filename", match.getName(), is("202400.zip"));
+    }
+
+    @Test
+    void test_jira_dbckat_292_fileOrder2() throws ConfigFilesHandlerException {
+        final ConfigFilesHandlerBean configFilesHandlerBean = new MockConfigFilesHandlerBean();
+        final File file1 = mock(File.class);
+        final File file2 = mock(File.class);
+        when(file1.getName()).thenReturn("202500.zip");
+        when(file2.getName()).thenReturn("202400.zip");
+        when(mockedConfDir.listFiles()).thenReturn(new File[]{file1, file2});
+        final File match = configFilesHandlerBean.getConfigFiles(202301);
+
+        assertThat("filename", match.getName(), is("202400.zip"));
+    }
+
+    @Test
     void test_getConfigFilesNonNumericFilename() throws ConfigFilesHandlerException {
         File file1 = mock(File.class);
         File file2 = mock(File.class);
