@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.util.Arrays.sort;
 
 @Stateless
 public class ConfigFilesHandlerBean {
@@ -38,6 +41,8 @@ public class ConfigFilesHandlerBean {
         LOGGER.info("Asking for {}", targetVersion);
         final File[] files = confDir.listFiles();
         if (files != null) {
+            // getClosestMatchIndex depend on the files being sorted by name
+            sort(files, Comparator.comparing(File::getName));
             for (File file : files) {
                 LOGGER.info("File {}", file.getName());
             }
